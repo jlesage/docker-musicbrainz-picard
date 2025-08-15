@@ -34,6 +34,7 @@ RUN \
         py3-numpy \
         libdiscid \
         chromaprint \
+        rsgain \
         # For optical drive listing.
         lsscsi \
         # Needed for dark mode support.
