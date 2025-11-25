@@ -70,6 +70,10 @@ app:
           [4:0:0:0]    cd/dvd  hp HLDS  DVDRW  GUD1N     LD02  /dev/sr0
           ```
   changelog:
+    - version: 25.11.1
+      date: 2025-11-24
+      changes:
+        - 'Fixed support of ReplayGain plugin.'
     - version: 25.07.2
       date: 2025-07-28
       changes:
