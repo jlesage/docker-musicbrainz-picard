@@ -57,6 +57,7 @@ database.
    * [GPU Acceleration Support](#gpu-acceleration-support)
    * [Shell Access](#shell-access)
    * [Access to Optical Drives](#access-to-optical-drives)
+   * [Picard Command-Line Interface](#picard-command-line-interface)
    * [Support or Contact](#support-or-contact)
 
 ## Quick Start
@@ -790,6 +791,20 @@ The following example shows that `/dev/sr0` should be exposed:
 [1:0:0:0]    disk    ATA      SanDisk SSD PLUS 9100  /dev/sdb
 [2:0:0:0]    disk    ATA      ST3500418AS      HP34  /dev/sdc
 [4:0:0:0]    cd/dvd  hp HLDS  DVDRW  GUD1N     LD02  /dev/sr0
+```
+
+## Picard Command-Line Interface
+
+MusicBrainz Picard as a useful feature documented in
+[Command and Batch Processing](https://picard-docs.musicbrainz.org/en/usage/command_processing.html),
+which allows commands to be sent to a running instance.
+
+With this container, the CLI can be easily invoked using the provided
+`picard-cli` helper. For example, the following command loads a specific
+release:
+
+```
+docker exec <container name> picard-cli -e load mbid://release/dbd0ce67-cae6-33eb-8f5a-1143a30c2353
 ```
 
 ## Support or Contact

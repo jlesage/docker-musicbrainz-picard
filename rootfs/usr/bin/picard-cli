@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e # Exit immediately if a command exits with a non-zero status.
+set -u # Treat unset variables as an error.
+
+# Load internal environment variables.
+. "$ENV"
+
+[ -n "${1:-}" ] || set -- "$@" "-h"
+set -- "/config/Picard.ini" "$@"
+set -- "-c" "$@"
+
+if [ "$(id -u)" -eq 0 ]; then
+    exec su-exec app /usr/bin/picard "$@"
+else
+    exec /usr/bin/picard "$@"
+fi
+
+# vim:ts=4:sw=4:et:sts=4
