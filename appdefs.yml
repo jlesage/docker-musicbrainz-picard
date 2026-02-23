@@ -84,6 +84,11 @@ app:
           docker exec <container name> picard-cli -e load mbid://release/dbd0ce67-cae6-33eb-8f5a-1143a30c2353
           ```
   changelog:
+    - version: 26.02.2
+      date: 2026-02-22
+      changes:
+        - 'Updated baseimage to version 4.11.2, bringing the following changes'
+        - '2:Fixed X server failing to find the appropriate Mesa driver on some setups.'
     - version: 26.02.1
       date: 2026-02-19
       changes:
