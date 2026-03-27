@@ -874,16 +874,12 @@ ReplayGain tags to your music files.
 1. Go to **Options** > **Options...** > **Plugins** > **ReplayGain 2.0**.
 2. Set the **rsgain command** to:
 
-```text
-/usr/bin/rsgain
-```
-
-<!-- markdownlint-disable MD029 -->
+    ```text
+    /usr/bin/rsgain
+    ```
 
 3. Adjust any other settings (e.g., target loudness) as desired.
 4. Click **Make It So!** to save.
-
-<!-- markdownlint-enable MD029 -->
 
 > [!NOTE]
 > Since `rsgain` is bundled with the container, no additional installation is
