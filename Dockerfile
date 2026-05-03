@@ -44,6 +44,9 @@ RUN \
         # dbus is needed to allow multiple Firefox windows using the same
         # profile.
         dbus \
+        # To play media files.
+        ffmpeg \
+        ffplay \
         # Need a font.
         font-croscore
 
@@ -89,6 +92,7 @@ RUN \
     set-cont-env APP_NAME "MusicBrainz Picard" && \
     set-cont-env APP_VERSION "$PICARD_VERSION" && \
     set-cont-env DOCKER_IMAGE_VERSION "$DOCKER_IMAGE_VERSION" && \
+    set-cont-env DISABLE_GLX 1 && \
     true
 
 # Define mountable directories.

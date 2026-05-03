@@ -11,8 +11,18 @@ case "$ARG" in
         # Open URLs in new window.
         /usr/lib/firefox-esr/firefox-esr --new-window "$ARG"
         ;;
-    *)
-        echo "don't know how to open: $ARG"
-        exit 1
+    file://*)
+        f="$(echo "$ARG" | sed 's|^file://||')"
+        if ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" >/dev/null 2>&1; then
+            # This is a file that can be played with with ffplay.
+            # Use the current screen size to determine the size of the ffplay window.
+            DISPLAY_SIZE="$(obxprop --root | grep "^_NET_DESKTOP_GEOMETRY" | cut -d'=' -f2 | tr -d ',' | awk '{print $1; print $2}')"
+            X="$(echo "$DISPLAY_SIZE" | head -n1)"
+            Y="$(echo "$DISPLAY_SIZE" | tail -n1)"
+            exec ffplay -loglevel quiet -x "$(expr "$X" / 2)" -y "$(expr "$Y" / 2)" "$f" 2>/dev/null
+        fi
         ;;
 esac
+
+echo "don't know how to open: $ARG"
+exit 1
