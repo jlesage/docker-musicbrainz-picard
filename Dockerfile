@@ -4,9 +4,6 @@
 # https://github.com/jlesage/docker-musicbrainz-picard
 #
 
-# Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.20-v4.11.3
-
 # Docker image version is provided via build arg.
 ARG DOCKER_IMAGE_VERSION=
 
@@ -15,6 +12,47 @@ ARG PICARD_VERSION=2.13.3
 
 # Define software download URLs.
 ARG PICARD_URL=https://data.musicbrainz.org/pub/musicbrainz/picard/picard-${PICARD_VERSION}.tar.gz
+
+# Get Dockerfile cross-compilation helpers.
+FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
+
+# Get UPX (statically linked).
+# NOTE: UPX 5.x is not compatible with old kernels (e.g. 3.10) used by some
+#       Synology NASes. See https://github.com/upx/upx/issues/902
+FROM --platform=$BUILDPLATFORM alpine:3.20 AS upx
+ARG UPX_VERSION=4.2.4
+RUN \
+    if echo "${UPX_VERSION}" | grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+$'; then \
+        apk --no-cache add curl && \
+        mkdir /tmp/upx && \
+        curl -# -L https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz | tar xJ --strip 1 -C /tmp/upx && \
+        cp -v /tmp/upx/upx /usr/bin/upx; \
+    else \
+        apk --no-cache add build-base cmake clang git && \
+        git clone https://github.com/upx/upx.git && \
+        git -C upx reset --hard ${UPX_VERSION} && \
+        git -C upx submodule update --init && \
+        make -C upx build/extra/gcc/all CC="clang" CXX="clang++" CFLAGS="-static" CXXFLAGS="-static" LDFLAGS="-Wl,--strip-all" && \
+        cp -v upx/build/extra/gcc/release/upx /usr/bin/upx; \
+    fi
+
+# Build fileurl2path.
+FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS fileurl2path
+ARG TARGETPLATFORM
+ENV CGO_ENABLED=0
+COPY --from=xx / /
+COPY src/fileurl2path /tmp/build-fileurl2path
+RUN cd /tmp/build-fileurl2path && xx-go build -ldflags "-s -w"
+RUN xx-verify --static /tmp/build-fileurl2path/fileurl2path
+COPY --from=upx /usr/bin/upx /usr/bin/upx
+RUN upx /tmp/build-fileurl2path/fileurl2path
+
+# Pull base image.
+FROM jlesage/baseimage-gui:alpine-3.20-v4.11.3
+
+ARG PICARD_VERSION
+ARG PICARD_URL
+ARG DOCKER_IMAGE_VERSION
 
 # Define working directory.
 WORKDIR /tmp
@@ -86,6 +124,7 @@ RUN \
 
 # Add files.
 COPY rootfs/ /
+COPY --from=fileurl2path /tmp/build-fileurl2path/fileurl2path /usr/bin/
 
 # Set internal environment variables.
 RUN \

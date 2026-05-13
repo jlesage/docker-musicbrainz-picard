@@ -12,7 +12,7 @@ case "$ARG" in
         /usr/lib/firefox-esr/firefox-esr --new-window "$ARG"
         ;;
     file://*)
-        f="$(echo "$ARG" | sed 's|^file://||')"
+        f="$(fileurl2path "$ARG")"
         if ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" >/dev/null 2>&1; then
             # This is a file that can be played with with ffplay.
             # Use the current screen size to determine the size of the ffplay window.
