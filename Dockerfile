@@ -82,9 +82,11 @@ RUN \
         # dbus is needed to allow multiple Firefox windows using the same
         # profile.
         dbus \
-        # To play media files.
+        # To play media files via external player.
         ffmpeg \
         ffplay \
+        # To play media files via internal player.
+        gst-plugins-good \
         # Need a font.
         font-croscore
 
