@@ -48,7 +48,7 @@ COPY --from=upx /usr/bin/upx /usr/bin/upx
 RUN upx /tmp/build-fileurl2path/fileurl2path
 
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.20-v4.12.5
+FROM jlesage/baseimage-gui:alpine-3.20-v4.12.6
 
 ARG PICARD_VERSION
 ARG PICARD_URL
