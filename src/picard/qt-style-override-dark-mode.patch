@@ -1,0 +1,31 @@
+Picard 3 dropped the "system" UI theme. Follow DARK_MODE by treating
+QT_STYLE_OVERRIDE=Adwaita-Dark as a dark system theme.
+--- a/picard/ui/theme_detect.py
++++ b/picard/ui/theme_detect.py
+@@ -176,9 +176,26 @@
+     return False
+ 
+ 
++def detect_qt_style_override_dark() -> bool:
++    """Detect dark mode from QT_STYLE_OVERRIDE.
++
++    The container base image sets QT_STYLE_OVERRIDE to Adwaita-Dark when
++    DARK_MODE=1. Openbox does not match the desktop-environment detectors,
++    so this is checked first. An unset or non-dark value returns False and
++    leaves detection to the strategies below.
++    """
++    style = os.environ.get("QT_STYLE_OVERRIDE")
++    if style and "dark" in style.lower():
++        log.debug(f"Detected QT_STYLE_OVERRIDE: {style} (dark)")
++        return True
++    return False
++
++
+ def get_linux_dark_mode_strategies() -> list[Callable[[], bool]]:
+     """Return the list of dark mode detection strategies in order of priority."""
+     return [
++        # Container dark mode (base image sets this from DARK_MODE).
++        detect_qt_style_override_dark,
+         # D-Bus based detection using the using org.freedesktop.portal.Settings interface
+         detect_freedesktop_color_scheme_dbus,
+         # Legacy methods (settings based on desktop environment)

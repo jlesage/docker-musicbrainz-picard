@@ -8,7 +8,7 @@
 ARG DOCKER_IMAGE_VERSION=
 
 # Define software versions.
-ARG PICARD_VERSION=2.13.3
+ARG PICARD_VERSION=3.0.1
 
 # Define software download URLs.
 ARG PICARD_URL=https://data.musicbrainz.org/pub/musicbrainz/picard/picard-${PICARD_VERSION}.tar.gz
@@ -36,6 +36,12 @@ RUN \
         cp -v upx/build/extra/gcc/release/upx /usr/bin/upx; \
     fi
 
+# Build MusicBrainz Picard.
+FROM alpine:3.24 AS picard
+ARG PICARD_URL
+COPY src/picard /build
+RUN /build/build.sh "$PICARD_URL"
+
 # Build fileurl2path.
 FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS fileurl2path
 ARG TARGETPLATFORM
@@ -48,10 +54,9 @@ COPY --from=upx /usr/bin/upx /usr/bin/upx
 RUN upx /tmp/build-fileurl2path/fileurl2path
 
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.20-v4.14.0
+FROM jlesage/baseimage-gui:alpine-3.24-v4.14.0
 
 ARG PICARD_VERSION
-ARG PICARD_URL
 ARG DOCKER_IMAGE_VERSION
 
 # Define working directory.
@@ -60,23 +65,21 @@ WORKDIR /tmp
 # Install dependencies.
 RUN \
     add-pkg \
-        py3-qt5 \
-        py3-pyaml \
+        py3-qt6 \
+        py3-yaml \
         py3-mutagen \
         py3-jwt \
         py3-markdown \
-        py3-fasteners \
-        py3-six \
         py3-charset-normalizer \
-        py3-dateutil \
-        py3-numpy \
+        py3-tomlkit \
+        py3-pygit2 \
         libdiscid \
         chromaprint \
         rsgain \
         # For optical drive listing.
         lsscsi \
         # Needed for dark mode support.
-        adwaita-qt \
+        adwaita-qt6 \
         # A browser is needed.
         firefox-esr \
         # dbus is needed to allow multiple Firefox windows using the same
@@ -86,38 +89,10 @@ RUN \
         ffmpeg \
         ffplay \
         # To play media files via internal player.
+        qt6-qtmultimedia-gstreamer \
         gst-plugins-good \
         # Need a font.
         font-croscore
-
-# Install MusicBrainz Picard.
-RUN \
-    # Install packages needed by the build.
-    add-pkg --virtual build-dependencies \
-        build-base \
-        python3-dev \
-        py3-pip \
-        gettext \
-        curl \
-        && \
-    # Download the MusicBrainz Picard package.
-    echo "Downloading MusicBrainz Picard..." && \
-    mkdir /tmp/musicbrainz-picard && \
-    curl -L -# ${PICARD_URL} | tar xz --strip 1 -C /tmp/musicbrainz-picard && \
-    # Patch MusicBrainz Picard.
-    echo "Patching MusicBrainz Picard..." && \
-    sed-patch 's/self.disable_autoupdate = None/self.disable_autoupdate = True/' /tmp/musicbrainz-picard/setup.py && \
-    sed-patch "s/TextOption('setting', 'ui_theme', str(UiTheme.DEFAULT)),/TextOption('setting', 'ui_theme', str(UiTheme.SYSTEM)),/" /tmp/musicbrainz-picard/picard/ui/options/interface.py && \
-    # Compile MusicBrainz Picard.
-    echo "Compiling MusicBrainz Picard..." && \
-    cd /tmp/musicbrainz-picard && \
-    pip install --break-system-packages . && \
-    # Needed by the BPM Analyzer plugin.
-    pip install --break-system-packages aubio && \
-    cd /tmp && \
-    # Cleanup.
-    del-pkg build-dependencies && \
-    rm -rf /tmp/* /tmp/.[!.]*
 
 # Generate and install favicons.
 RUN \
@@ -126,6 +101,7 @@ RUN \
 
 # Add files.
 COPY rootfs/ /
+COPY --from=picard /tmp/picard-install/usr/ /usr/
 COPY --from=fileurl2path /tmp/build-fileurl2path/fileurl2path /usr/bin/
 
 # Set internal environment variables.
