@@ -87,7 +87,7 @@ app:
     - version: 26.10.1
       date: 2026-10-09
       changes:
-        - 'Upgraded MusicBrainz Picard to version 3.0.1.'
+        - 'Updated MusicBrainz Picard to version 3.0.1.'
     - version: 26.09.1
       date: 2026-09-22
       changes:
