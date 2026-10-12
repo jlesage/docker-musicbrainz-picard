@@ -8,7 +8,7 @@
 ARG DOCKER_IMAGE_VERSION=
 
 # Define software versions.
-ARG PICARD_VERSION=3.0.1
+ARG PICARD_VERSION=3.0.2
 
 # Define software download URLs.
 ARG PICARD_URL=https://data.musicbrainz.org/pub/musicbrainz/picard/picard-${PICARD_VERSION}.tar.gz
