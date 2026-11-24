@@ -84,6 +84,10 @@ app:
           docker exec <container name> picard-cli -e load mbid://release/dbd0ce67-cae6-33eb-8f5a-1143a30c2353
           ```
   changelog:
+    - version: 26.11.2
+      date: 2026-11-24
+      changes:
+        - 'Updated MusicBrainz Picard to version 3.0.5.'
     - version: 26.11.1
       date: 2026-11-04
       changes:
