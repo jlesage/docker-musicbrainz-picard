@@ -84,6 +84,20 @@ app:
           docker exec <container name> picard-cli -e load mbid://release/dbd0ce67-cae6-33eb-8f5a-1143a30c2353
           ```
   changelog:
+    - version: 26.11.3
+      date: 2026-11-25
+      changes:
+        - 'Updated baseimage to version 4.15.0, which brings the following changes:'
+        - '2:Added web microphone support.'
+        - '2:Added H.264 encoding support for a moving screen in the web interface.'
+        - '2:Web audio sample rate is now 48000 Hz.'
+        - '2:Web audio now skips near-silence.'
+        - '2:The web interface now shows the browser''s own mouse pointer.'
+        - '2:Improved responsiveness of screen updates in the web interface.'
+        - '2:Fixed one-pixel border showing above the main application window.'
+        - '2:Fixed main window un-maximizing on Alt+drag.'
+        - '2:Fixed web audio staying off after the web interface reconnects.'
+        - '2:Fixed idle JPEG refresh delaying the next interaction.'
     - version: 26.11.2
       date: 2026-11-24
       changes:
